@@ -21,6 +21,8 @@
           opentrack_custom = final.qt5.callPackage ./packages/opentrack { };
           goverlay_latest = final.callPackage ./packages/goverlay { };
           vulkan-hdr-layer = final.callPackage ./packages/vkHdrLayer { };
+          zluda_custom = prev.callPackage ./packages/zluda { };
+          davinci-resolve-studio = prev.callPackage ./packages/davinci-resolve-studio { studioVariant = true; };
         };
       };
     };
