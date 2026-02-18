@@ -413,15 +413,27 @@ return {
           filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cc', 'mpp', 'ixx' },
         },
         somesass_ls = {
+          root_dir = function()
+            return vim.loop.cwd()
+          end,
           filetypes = { 'sass', 'scss' },
         },
         cssls = {
+          root_dir = function()
+            return vim.loop.cwd()
+          end,
           filetypes = { 'css', 'html', 'javascriptreact', 'typescriptreact' },
         },
         css_variables = {
+          root_dir = function()
+            return vim.loop.cwd()
+          end,
           filetypes = { 'css', 'scss', 'less', 'vue', 'html' },
         },
         cssmodules_ls = {
+          root_dir = function()
+            return vim.loop.cwd()
+          end,
           filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue' },
         },
         emmet_language_server = {},
