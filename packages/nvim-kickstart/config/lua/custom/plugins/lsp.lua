@@ -80,6 +80,73 @@ local attach_callback = function(event)
     -- end, '[G]oto remove [U]nused')
   end
 
+  -- Vue: jump from class name in template to style definition
+  if client and client.name == 'vue_ls' then
+    -- Follow LSP document links (vue_ls provides scoped-class-links)
+    map('gL', function()
+      local params = vim.lsp.util.make_text_document_params(bufnr)
+      client:request('textDocument/documentLink', params, function(err, result)
+        if err or not result or #result == 0 then
+          vim.notify('No document links found', vim.log.levels.INFO)
+          return
+        end
+        local cursor = vim.api.nvim_win_get_cursor(0)
+        local row = cursor[1] - 1
+        local col = cursor[2]
+        for _, link in ipairs(result) do
+          local range = link.range
+          if row >= range.start.line and row <= range['end'].line and col >= range.start.character and col <= range['end'].character then
+            if link.target then
+              local uri, fragment = link.target:match('^(.-)#(.+)$')
+              uri = uri or link.target
+              local fname = vim.uri_to_fname(uri)
+              if fragment then
+                local sline = fragment:match('^L(%d+)')
+                if sline then
+                  vim.cmd('edit ' .. vim.fn.fnameescape(fname))
+                  vim.api.nvim_win_set_cursor(0, { tonumber(sline), 0 })
+                  vim.cmd 'normal! zz'
+                  return
+                end
+              end
+              vim.cmd('edit ' .. vim.fn.fnameescape(fname))
+            end
+            return
+          end
+        end
+        vim.notify('No document link under cursor', vim.log.levels.INFO)
+      end, bufnr)
+    end, 'Follow Document [L]ink')
+
+    -- Simple search fallback: jump to .classname in <style> block
+    map('gsc', function()
+      local word = vim.fn.expand '<cword>'
+      if word == '' then
+        return
+      end
+      local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+      local in_style = false
+      local pattern = '%.' .. vim.pesc(word) .. '[%s%{,:%[>~+)]'
+      for i, line in ipairs(lines) do
+        if line:match '<style' then
+          in_style = true
+        end
+        if in_style then
+          local col = line:find(pattern)
+          if col then
+            vim.api.nvim_win_set_cursor(0, { i, col - 1 })
+            vim.cmd 'normal! zz'
+            return
+          end
+        end
+        if line:match '</style>' then
+          in_style = false
+        end
+      end
+      vim.notify('Class .' .. word .. ' not found in <style> block', vim.log.levels.WARN)
+    end, '[G]oto [S]tyle [C]lass')
+  end
+
   -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
   ---@param client vim.lsp.Client
   ---@param method vim.lsp.protocol.Method
@@ -416,11 +483,7 @@ return {
           root_dir = function(bufnr, on_dir)
             on_dir(vim.uv.cwd())
           end,
-          filetypes = { 'sass', 'scss', 'vue' },
-          on_attach = function(client)
-            -- Disable hover to avoid duplicates (vue_ls/cssls handle hover)
-            client.server_capabilities.hoverProvider = false
-          end,
+          filetypes = { 'sass', 'scss' },
         },
         cssls = {
           root_dir = function(bufnr, on_dir)
