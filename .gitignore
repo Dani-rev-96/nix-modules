@@ -1,0 +1,11 @@
+#direnv
+.direnv
+.envrc*
+
+# Never commit age private keys
+secrets/private-age-key.txt
+
+**/*.cred.*
+!**/*.cred.enc.*
+
+**/*.terragrunt-cache

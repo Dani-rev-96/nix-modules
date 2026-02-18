@@ -412,6 +412,15 @@ return {
         clangd = {
           filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cc', 'mpp', 'ixx' },
         },
+        somesass_ls = {
+          filetypes = { 'sass', 'scss', 'css', 'vue' },
+        },
+        -- cssls = {
+        --   filetypes = { 'css', 'scss', 'less' },
+        -- },
+        -- css_variables_ls = {
+        --   filetypes = { 'css', 'scss', 'less' },
+        -- },
       }
 
       if vim.fn.executable 'kubectl' == 1 then
