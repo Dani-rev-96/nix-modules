@@ -413,17 +413,18 @@ return {
           filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cc', 'mpp', 'ixx' },
         },
         somesass_ls = {
-          filetypes = { 'sass', 'scss', 'css', 'vue' },
+          filetypes = { 'sass', 'scss' },
         },
         cssls = {
-          filetypes = { 'css', 'scss', 'vue', 'html', 'javascriptreact', 'typescriptreact' },
+          filetypes = { 'css', 'html', 'javascriptreact', 'typescriptreact' },
         },
         css_variables_ls = {
-          filetypes = { 'css', 'scss', 'less' },
+          filetypes = { 'css', 'scss', 'less', 'vue', 'html' },
         },
         cssmodules_ls = {
-          filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+          filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue' },
         },
+        emmet_language_server = {},
       }
 
       if vim.fn.executable 'kubectl' == 1 then
@@ -468,6 +469,10 @@ return {
         'stylua', -- Used to format Lua code
         'jdtls',
         'prettier',
+        'css-lsp',
+        'cssmodules-language-server',
+        'css-variables-language-server',
+        'some-sass-language-server',
         -- 'vue_ls',
         -- 'vtsls',
       })
