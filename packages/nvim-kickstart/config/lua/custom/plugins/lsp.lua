@@ -219,6 +219,14 @@ return {
       },
     },
   },
+  -- lazy.nvim plugin spec
+  {
+    'Dani-rev-96/css-classes',
+    build = 'npm install && npm run build',
+    config = function()
+      vim.lsp.enable('css_classes')
+    end,
+  },
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
@@ -505,7 +513,6 @@ return {
         },
         emmet_language_server = {},
         css_classes = {
-          cmd = { 'node', vim.fn.expand '~/Workspace/css-classes/dist/server.js', '--stdio' },
           filetypes = { 'html', 'vue', 'javascriptreact', 'typescriptreact', 'css', 'scss' },
           root_markers = { '.git' },
         },
