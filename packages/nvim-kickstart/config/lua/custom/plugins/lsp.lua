@@ -507,7 +507,7 @@ return {
         css_classes = {
           cmd = { 'node', vim.fn.expand '~/Workspace/css-classes/dist/server.js', '--stdio' },
           filetypes = { 'html', 'vue', 'javascriptreact', 'typescriptreact', 'css', 'scss' },
-          root_markers = { 'package.json', '.git' },
+          root_markers = { '.git' },
         },
       }
 
