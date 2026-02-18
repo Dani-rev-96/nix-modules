@@ -416,13 +416,17 @@ return {
           root_dir = function(bufnr, on_dir)
             on_dir(vim.uv.cwd())
           end,
-          filetypes = { 'sass', 'scss' },
+          filetypes = { 'sass', 'scss', 'vue' },
+          on_attach = function(client)
+            -- Disable hover to avoid duplicates (vue_ls/cssls handle hover)
+            client.server_capabilities.hoverProvider = false
+          end,
         },
         cssls = {
           root_dir = function(bufnr, on_dir)
             on_dir(vim.uv.cwd())
           end,
-          filetypes = { 'css', 'html', 'javascriptreact', 'typescriptreact' },
+          filetypes = { 'css', 'scss', 'html', 'javascriptreact', 'typescriptreact' },
         },
         css_variables = {
           root_dir = function(bufnr, on_dir)
