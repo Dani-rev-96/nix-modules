@@ -97,11 +97,11 @@ local attach_callback = function(event)
           local range = link.range
           if row >= range.start.line and row <= range['end'].line and col >= range.start.character and col <= range['end'].character then
             if link.target then
-              local uri, fragment = link.target:match('^(.-)#(.+)$')
+              local uri, fragment = link.target:match '^(.-)#(.+)$'
               uri = uri or link.target
               local fname = vim.uri_to_fname(uri)
               if fragment then
-                local sline = fragment:match('^L(%d+)')
+                local sline = fragment:match '^L(%d+)'
                 if sline then
                   vim.cmd('edit ' .. vim.fn.fnameescape(fname))
                   vim.api.nvim_win_set_cursor(0, { tonumber(sline), 0 })
@@ -504,6 +504,11 @@ return {
           filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue' },
         },
         emmet_language_server = {},
+        css_classes = {
+          cmd = { 'node', '~/Workspace/css-classes/dist/server.js', '--stdio' },
+          filetypes = { 'html', 'vue', 'javascriptreact', 'typescriptreact', 'css', 'scss' },
+          root_markers = { 'package.json', '.git' },
+        },
       }
 
       if vim.fn.executable 'kubectl' == 1 then
@@ -542,6 +547,10 @@ return {
 
       ensure_installed = vim.tbl_filter(function(name)
         return name ~= 'nixd'
+      end, ensure_installed)
+
+      ensure_installed = vim.tbl_filter(function(name)
+        return name ~= 'css_classes'
       end, ensure_installed)
 
       vim.list_extend(ensure_installed, {
