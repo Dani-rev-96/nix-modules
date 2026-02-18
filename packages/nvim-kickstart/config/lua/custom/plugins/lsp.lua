@@ -418,7 +418,7 @@ return {
         cssls = {
           filetypes = { 'css', 'html', 'javascriptreact', 'typescriptreact' },
         },
-        css_variables_ls = {
+        css_variables = {
           filetypes = { 'css', 'scss', 'less', 'vue', 'html' },
         },
         cssmodules_ls = {
