@@ -38,6 +38,8 @@ in
         cargo
         jdk
         go
+        lua-language-server
+        stylua
       ];
     };
 
