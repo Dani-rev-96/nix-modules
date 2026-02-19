@@ -54,6 +54,11 @@ local attach_callback = function(event)
   map('grd', function()
     vim.lsp.buf.definition({
       on_list = function(options)
+        -- Save position in jumplist so <C-o> works after any navigation
+        vim.cmd("normal! m'")
+        local from = { vim.fn.bufnr('%'), vim.fn.line('.'), vim.fn.col('.'), 0 }
+        vim.fn.settagstack(vim.fn.win_getid(), { items = { { tagname = vim.fn.expand('<cword>'), from = from } } }, 't')
+
         if #options.items == 1 then
           local item = options.items[1]
           local b = vim.fn.bufadd(item.filename)
@@ -62,7 +67,7 @@ local attach_callback = function(event)
           vim.api.nvim_win_set_cursor(0, { item.lnum, item.col - 1 })
         else
           vim.fn.setqflist({}, ' ', options)
-          require('telescope.builtin').quickfix()
+          require('telescope.builtin').quickfix({prompt_title = 'LSP Definitions'})
         end
       end,
     })
