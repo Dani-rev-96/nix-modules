@@ -49,7 +49,24 @@ local attach_callback = function(event)
   -- Jump to the definition of the word under your cursor.
   --  This is where a variable was first declared, or where a function is defined, etc.
   --  To jump back, press <C-t>.
-  map('grd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+  -- map('grd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+  --
+  map('grd', function()
+    vim.lsp.buf.definition({
+      on_list = function(options)
+        if #options.items == 1 then
+          local item = options.items[1]
+          local b = vim.fn.bufadd(item.filename)
+          vim.bo[b].buflisted = true
+          vim.api.nvim_win_set_buf(0, b)
+          vim.api.nvim_win_set_cursor(0, { item.lnum, item.col - 1 })
+        else
+          vim.fn.setqflist({}, ' ', options)
+          require('telescope.builtin').quickfix()
+        end
+      end,
+    })
+  end, '[G]oto [D]efinition')
 
   -- WARN: This is not Goto Definition, this is Goto Declaration.
   --  For example, in C this would take you to the header.
