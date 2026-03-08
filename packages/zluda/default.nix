@@ -17,13 +17,13 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "zluda";
-  version = "6-preview.20260121";
+  version = "6-preview.20260308";
 
   src = fetchFromGitHub {
     owner = "vosen";
     repo = "ZLUDA";
-    rev = "a5ecf6ae8fc46da84ed906ad9fbfb5a1a53742ef";
-    hash = "sha256-vQYAA8/eVYCXUknRQ4cmgWlbIjpGwm16AUROoS5nlO4=";
+    rev = "796ad6ca1d13a0d9a071ccb515a850ea610959c9";
+    hash = "sha256-CkRFor6wPqthiM/PDqh65quVu9y/PQPWmVjWCuVkqOI=";
     fetchSubmodules = true;
   };
 
