@@ -52,7 +52,7 @@ rustPlatform.buildRustPackage rec {
     clang
   ];
 
-  cargoHash = "sha256-YNBeweZ/vfXGfM0lrZbAh71z6Rb0+B7nOuO8VL2BmCo=";
+  cargoHash = "sha256-1xnkpskyq/JmbgpY4bCTEiz4uEFp66TtRIbpIFWiuvo=";
 
   # xtask doesn't support passing --target, but nix hooks expect the folder structure from when it's set
   env.CARGO_BUILD_TARGET = stdenv.hostPlatform.rust.cargoShortTarget;
