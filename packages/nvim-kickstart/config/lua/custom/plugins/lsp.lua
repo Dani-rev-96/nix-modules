@@ -52,12 +52,12 @@ local attach_callback = function(event)
   -- map('grd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
   --
   map('grd', function()
-    vim.lsp.buf.definition({
+    vim.lsp.buf.definition {
       on_list = function(options)
         -- Save position in jumplist so <C-o> works after any navigation
-        vim.cmd("normal! m'")
-        local from = { vim.fn.bufnr('%'), vim.fn.line('.'), vim.fn.col('.'), 0 }
-        vim.fn.settagstack(vim.fn.win_getid(), { items = { { tagname = vim.fn.expand('<cword>'), from = from } } }, 't')
+        vim.cmd "normal! m'"
+        local from = { vim.fn.bufnr '%', vim.fn.line '.', vim.fn.col '.', 0 }
+        vim.fn.settagstack(vim.fn.win_getid(), { items = { { tagname = vim.fn.expand '<cword>', from = from } } }, 't')
 
         if #options.items == 1 then
           local item = options.items[1]
@@ -67,10 +67,10 @@ local attach_callback = function(event)
           vim.api.nvim_win_set_cursor(0, { item.lnum, item.col - 1 })
         else
           vim.fn.setqflist({}, ' ', options)
-          require('telescope.builtin').quickfix({prompt_title = 'LSP Definitions'})
+          require('telescope.builtin').quickfix { prompt_title = 'LSP Definitions' }
         end
       end,
-    })
+    }
   end, '[G]oto [D]efinition')
 
   -- WARN: This is not Goto Definition, this is Goto Declaration.
@@ -246,7 +246,7 @@ return {
     'Dani-rev-96/css-classes',
     build = 'npm install && npm run build',
     config = function()
-      vim.lsp.enable('css_classes')
+      vim.lsp.enable 'css_classes'
     end,
   },
   {
@@ -538,6 +538,9 @@ return {
           filetypes = { 'html', 'vue', 'javascriptreact', 'typescriptreact', 'css', 'scss' },
           root_markers = { '.git' },
         },
+        marksman = {
+          filetypes = { 'markdown' },
+        },
       }
 
       if vim.fn.executable 'kubectl' == 1 then
@@ -590,6 +593,8 @@ return {
         'cssmodules-language-server',
         'css-variables-language-server',
         'some-sass-language-server',
+        'markdownlint-cli2',
+        'markdown-toc',
         -- 'vue_ls',
         -- 'vtsls',
       })
