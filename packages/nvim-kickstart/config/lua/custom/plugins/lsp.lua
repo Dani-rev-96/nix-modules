@@ -595,6 +595,7 @@ return {
         'some-sass-language-server',
         'markdownlint-cli2',
         'markdown-toc',
+        'markdownlint',
         -- 'vue_ls',
         -- 'vtsls',
       })
