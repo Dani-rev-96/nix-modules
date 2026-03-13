@@ -660,6 +660,9 @@ return {
           }
         end
       end,
+      default_format_opts = {
+        lsp_format = 'fallback',
+      },
       formatters_by_ft = {
         lua = { 'stylua' },
         typescript = { 'prettierd', 'prettier', stop_after_first = true },
@@ -667,6 +670,12 @@ return {
         javascript = { 'prettierd', 'prettier', stop_after_first = true },
         javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
         vue = { 'prettierd', 'prettier', stop_after_first = true },
+        nix = { 'nixfmt' },
+        bash = { 'shfmt' },
+        sh = { 'shfmt' },
+        bash = { 'shfmt' },
+        html = { 'prettierd', 'prettier', stop_after_first = true },
+        json = { 'prettierd', 'prettier', stop_after_first = true },
         ['*'] = { 'codespell' },
         ['_'] = { 'trim_whitespace' }, -- This will trim trailing whitespace in all files
         -- Conform can also run multiple formatters sequentially
