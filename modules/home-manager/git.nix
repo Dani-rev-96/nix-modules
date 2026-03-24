@@ -28,6 +28,7 @@ in
     programs.git = {
       enable = true;
       lfs.enable = true;
+      signing.format = null;
       settings = {
         user.email = lib.mkDefault cfg.email;
         user.name = lib.mkDefault cfg.name;
