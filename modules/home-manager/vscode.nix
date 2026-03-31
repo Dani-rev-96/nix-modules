@@ -179,6 +179,7 @@ in
           "terminal.integrated.defaultProfile.linux" = "zsh";
           "java.jdt.ls.vmargs" =
             "--add-opens=jdk.jdi/com.sun.tools.jdi=ALL-UNNAMED -XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:disable";
+          "dev.containers.dockerPath" = "podman";
         }
         // lib.optionalAttrs cfg.vim {
           "vim.useSystemClipboard" = true;
