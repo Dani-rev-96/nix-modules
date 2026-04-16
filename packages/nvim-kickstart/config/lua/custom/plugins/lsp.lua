@@ -538,9 +538,6 @@ return {
           filetypes = { 'html', 'vue', 'javascriptreact', 'typescriptreact', 'css', 'scss' },
           root_markers = { '.git' },
         },
-        marksman = {
-          filetypes = { 'markdown' },
-        },
       }
 
       if vim.fn.executable 'kubectl' == 1 then
