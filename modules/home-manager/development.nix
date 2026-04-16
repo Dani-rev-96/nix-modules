@@ -38,6 +38,7 @@ in
         pkg-config
         yaml-language-server
         lua-language-server
+        tree-sitter
       ]
       ++ (lib.optionals cfg.web [
         deno
