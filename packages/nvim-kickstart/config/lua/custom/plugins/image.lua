@@ -1,6 +1,11 @@
 return {
   {
     '3rd/image.nvim',
-    opts = {},
+    opts = {
+      markdown = {
+        enabled = false,  -- This should fix the error
+        render_settings = {},
+      },
+    },
   },
 }
