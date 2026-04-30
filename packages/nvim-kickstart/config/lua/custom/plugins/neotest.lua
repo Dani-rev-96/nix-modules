@@ -7,10 +7,10 @@ return {
       'nvim-lua/plenary.nvim',
       'antoinemadec/FixCursorHold.nvim',
       'nvim-treesitter/nvim-treesitter',
+      'nvim-telescope/telescope.nvim',
       'marilari88/neotest-vitest',
       'thenbe/neotest-playwright',
       'rcasia/neotest-java',
-      dependencies = 'nvim-telescope/telescope.nvim',
     },
     config = function()
       require('neotest').setup {
