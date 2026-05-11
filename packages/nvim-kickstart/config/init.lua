@@ -84,14 +84,6 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
--- Neovim 0.12+ changed match[id] in treesitter queries to return a list of
--- nodes instead of a single node. The archived nvim-treesitter plugin ships
--- incompatible query_predicates that crash on this change. Stub the module
--- out before anything can require it – Neovim 0.12 has these built-in.
-package.preload['nvim-treesitter.query_predicates'] = function()
-  return {}
-end
-
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -173,6 +165,32 @@ vim.o.scrolloff = 10
 -- instead raise a dialog asking if you wish to save the current file(s)
 -- See `:help 'confirm'`
 vim.o.confirm = true
+
+-- [[ Native Treesitter (Neovim 0.12+) ]]
+-- Ensure these parsers are installed. Neovim 0.12 downloads them automatically on first use,
+-- but listing them here pre-installs them so highlighting works immediately.
+local ensure_parsers = {
+  'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline',
+  'query', 'vim', 'vimdoc', 'java', 'vue', 'typescript', 'javascript',
+  'json', 'css', 'scss',
+}
+for _, lang in ipairs(ensure_parsers) do
+  pcall(vim.treesitter.language.add, lang)
+end
+
+-- Enable treesitter highlighting and indentation for all buffers with a parser available.
+vim.api.nvim_create_autocmd('FileType', {
+  group = vim.api.nvim_create_augroup('kickstart-treesitter', { clear = true }),
+  callback = function(args)
+    -- Skip markdown (using vim regex highlighting instead)
+    if args.match == 'markdown' then
+      return
+    end
+    if pcall(vim.treesitter.start, args.buf) then
+      vim.bo[args.buf].indentexpr = "v:lua.require'vim.treesitter'.indentexpr()"
+    end
+  end,
+})
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -540,53 +558,9 @@ require('lazy').setup({
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
   },
-  { -- Highlight, edit, and navigate code
-    'nvim-treesitter/nvim-treesitter',
-    version = false,
-    build = ':TSUpdate',
-    main = 'nvim-treesitter', -- Sets main module to use for opts
-    -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-    opts = {
-      ensure_installed = {
-        'bash',
-        'c',
-        'diff',
-        'html',
-        'lua',
-        'luadoc',
-        'markdown',
-        'markdown_inline',
-        'query',
-        'vim',
-        'vimdoc',
-        'java',
-        'vue',
-        'typescript',
-        'javascript',
-        'json',
-        'css',
-        'html',
-        'scss',
-      },
-      -- Autoinstall languages that are not installed
-      auto_install = true,
-      highlight = {
-        enable = true,
-        -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-        --  If you are experiencing weird indenting issues, add the language to
-        --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby' },
-        disable = { "markdown" },
-      },
-      indent = { enable = true, disable = { 'ruby' } },
-    },
-    -- There are additional nvim-treesitter modules that you can use to interact
-    -- with nvim-treesitter. You should go explore a few and see what interests you:
-    --
-    --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-    --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-    --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
-  },
+  -- [[ Native Treesitter (Neovim 0.12+) ]]
+  -- nvim-treesitter plugin removed; Neovim 0.12 manages parsers and highlighting natively.
+  -- Parsers are installed via `vim.treesitter.install` commands (e.g. :TSInstall java).
 
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
