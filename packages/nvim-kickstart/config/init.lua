@@ -537,6 +537,13 @@ require('lazy').setup({
     version = false,
     build = ':TSUpdate',
     main = 'nvim-treesitter', -- Sets main module to use for opts
+    init = function()
+      -- Prevent nvim-treesitter from registering incompatible query predicates.
+      -- Neovim 0.12+ has these built-in; the archived plugin's version crashes.
+      package.preload['nvim-treesitter.query_predicates'] = function()
+        return {}
+      end
+    end,
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
       ensure_installed = {
