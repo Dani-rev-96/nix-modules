@@ -84,6 +84,14 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
+-- Neovim 0.12+ changed match[id] in treesitter queries to return a list of
+-- nodes instead of a single node. The archived nvim-treesitter plugin ships
+-- incompatible query_predicates that crash on this change. Stub the module
+-- out before anything can require it – Neovim 0.12 has these built-in.
+package.preload['nvim-treesitter.query_predicates'] = function()
+  return {}
+end
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -537,13 +545,6 @@ require('lazy').setup({
     version = false,
     build = ':TSUpdate',
     main = 'nvim-treesitter', -- Sets main module to use for opts
-    init = function()
-      -- Prevent nvim-treesitter from registering incompatible query predicates.
-      -- Neovim 0.12+ has these built-in; the archived plugin's version crashes.
-      package.preload['nvim-treesitter.query_predicates'] = function()
-        return {}
-      end
-    end,
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
       ensure_installed = {
