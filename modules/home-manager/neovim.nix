@@ -25,26 +25,6 @@ in
       withNodeJs = true;
       withRuby = true;
       withPython3 = true;
-      # plugins = with pkgs.vimPlugins.nvim-treesitter-parsers; [
-      #   # Parser .so files only (no nvim-treesitter Lua runtime).
-      #   # Each is a minimal vim plugin with just parser/<lang>.so.
-      #   # Needed for: native Neovim 0.12 treesitter AND neotest subprocess.
-      #   typescript
-      #   javascript
-      #   vue
-      #   bash
-      #   lua
-      #   json
-      #   html
-      #   css
-      #   scss
-      #   java
-      #   markdown
-      #   markdown_inline
-      #   vimdoc
-      #   query
-      #   diff
-      # ];
       extraPackages = with pkgs; [
         lua
         ripgrep
@@ -62,6 +42,38 @@ in
         stylua
       ];
     };
+
+    # Symlink treesitter parser .so files into ~/.local/share/nvim/site/parser/
+    # This path is always in Neovim's rtp (including neotest's subprocess).
+    # Avoids conflicts with Neovim 0.12's native treesitter (no nvim-treesitter plugin runtime).
+    xdg.dataFile =
+      let
+        parsers = with pkgs.vimPlugins.nvim-treesitter-parsers; {
+          inherit
+            typescript
+            javascript
+            vue
+            bash
+            lua
+            json
+            html
+            css
+            scss
+            java
+            markdown
+            markdown_inline
+            vimdoc
+            query
+            diff
+            ;
+        };
+      in
+      lib.mapAttrs' (
+        name: drv:
+        lib.nameValuePair "nvim/site/parser/${name}.so" {
+          source = "${drv}/parser/${name}.so";
+        }
+      ) parsers;
 
     xdg.configFile."nvim" = lib.mkIf (pkgs ? my-nvim-kickstart) {
       source = config.lib.file.mkOutOfStoreSymlink "${pkgs.my-nvim-kickstart}";
