@@ -26,9 +26,9 @@ in
       withRuby = true;
       withPython3 = true;
       plugins = with pkgs.vimPlugins.nvim-treesitter-parsers; [
-        # Only parser grammars (.so files) as individual plugins — no nvim-treesitter runtime.
-        # This avoids conflicts with Neovim 0.12's native treesitter.
-        # Needed so neotest's subprocess can find parsers in the runtimepath.
+        # Parser .so files only (no nvim-treesitter Lua runtime).
+        # Each is a minimal vim plugin with just parser/<lang>.so.
+        # Needed for: native Neovim 0.12 treesitter AND neotest subprocess.
         typescript
         javascript
         vue
