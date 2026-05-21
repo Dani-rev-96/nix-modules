@@ -25,26 +25,26 @@ in
       withNodeJs = true;
       withRuby = true;
       withPython3 = true;
-      plugins = with pkgs.vimPlugins.nvim-treesitter-parsers; [
-        # Parser .so files only (no nvim-treesitter Lua runtime).
-        # Each is a minimal vim plugin with just parser/<lang>.so.
-        # Needed for: native Neovim 0.12 treesitter AND neotest subprocess.
-        typescript
-        javascript
-        vue
-        bash
-        lua
-        json
-        html
-        css
-        scss
-        java
-        markdown
-        markdown_inline
-        vimdoc
-        query
-        diff
-      ];
+      # plugins = with pkgs.vimPlugins.nvim-treesitter-parsers; [
+      #   # Parser .so files only (no nvim-treesitter Lua runtime).
+      #   # Each is a minimal vim plugin with just parser/<lang>.so.
+      #   # Needed for: native Neovim 0.12 treesitter AND neotest subprocess.
+      #   typescript
+      #   javascript
+      #   vue
+      #   bash
+      #   lua
+      #   json
+      #   html
+      #   css
+      #   scss
+      #   java
+      #   markdown
+      #   markdown_inline
+      #   vimdoc
+      #   query
+      #   diff
+      # ];
       extraPackages = with pkgs; [
         lua
         ripgrep
