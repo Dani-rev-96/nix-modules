@@ -9,6 +9,12 @@ return {
       'marilari88/neotest-vitest',
       'thenbe/neotest-playwright',
       'rcasia/neotest-java',
+      {
+        'nvim-treesitter/nvim-treesitter',
+        opts = {
+          ensure_installed = { 'typescript', 'javascript', 'vue' },
+        },
+      },
     },
     keys = {
       { '<leader>Tn', function() require('neotest').run.run() end, desc = 'Run nearest test' },
