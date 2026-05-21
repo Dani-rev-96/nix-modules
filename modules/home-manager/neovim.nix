@@ -25,6 +25,37 @@ in
       withNodeJs = true;
       withRuby = true;
       withPython3 = true;
+      plugins =
+        let
+          # Only parser grammars (.so files) — no nvim-treesitter plugin runtime.
+          # This avoids conflicts with Neovim 0.12's native treesitter.
+          # Needed so neotest's subprocess can parse TypeScript/JS test files.
+          fullTs = pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [
+            p.typescript
+            p.javascript
+            p.vue
+            p.bash
+            p.lua
+            p.json
+            p.html
+            p.css
+            p.scss
+            p.java
+            p.markdown
+            p.markdown_inline
+            p.vimdoc
+            p.query
+            p.diff
+          ]);
+          # Extract only the parser/ directory (no nvim-treesitter Lua runtime)
+          parsersOnly = pkgs.runCommandLocal "treesitter-parsers-only" { } ''
+            mkdir -p $out/parser
+            cp ${fullTs}/parser/*.so $out/parser/
+          '';
+        in
+        [
+          parsersOnly
+        ];
       extraPackages = with pkgs; [
         lua
         ripgrep
