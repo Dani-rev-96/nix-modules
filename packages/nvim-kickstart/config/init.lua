@@ -167,8 +167,27 @@ vim.o.scrolloff = 10
 vim.o.confirm = true
 
 -- [[ Native Treesitter (Neovim 0.12+) ]]
--- Ensure these parsers are installed. Neovim 0.12 downloads them automatically on first use,
--- but listing them here pre-installs them so highlighting works immediately.
+-- Add Nix-provided parser directories to runtimepath (before lazy.nvim resets rtp).
+-- This ensures both the main process AND neotest's subprocess can find parsers.
+for _, path in ipairs(vim.api.nvim_get_runtime_file('', true)) do
+  -- already in rtp
+end
+-- Find Nix grammar plugins in the packpath and add their parser dirs to rtp
+for _, dir in ipairs(vim.split(vim.o.packpath, ',')) do
+  local parser_dir = dir .. '/pack/myNeovimPackages/start'
+  if vim.fn.isdirectory(parser_dir) == 1 then
+    for name, type in vim.fs.dir(parser_dir) do
+      if type == 'directory' then
+        local plugin_path = parser_dir .. '/' .. name
+        if vim.fn.isdirectory(plugin_path .. '/parser') == 1 then
+          vim.opt.runtimepath:append(plugin_path)
+        end
+      end
+    end
+  end
+end
+
+-- Ensure these parsers are loaded.
 local ensure_parsers = {
   'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline',
   'query', 'vim', 'vimdoc', 'java', 'vue', 'typescript', 'javascript',
