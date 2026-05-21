@@ -67,13 +67,53 @@ in
             diff
             ;
         };
+        # nvim-treesitter source for query files (highlights, indents, injections, etc.)
+        tsQueries = "${pkgs.vimPlugins.nvim-treesitter}/runtime/queries";
+        # Languages that need query files (not bundled with Neovim 0.12 runtime)
+        queryLangs = [
+          "typescript"
+          "javascript"
+          "vue"
+          "html"
+          "css"
+          "scss"
+          "json"
+          "java"
+          "bash"
+          "diff"
+          "jsdoc"
+          "jsx"
+          "tsx"
+          "regex"
+          "ecma"
+        ];
       in
-      lib.mapAttrs' (
+      # Parser .so symlinks
+      (lib.mapAttrs' (
         name: drv:
         lib.nameValuePair "nvim/site/parser/${name}.so" {
           source = "${drv}/parser/${name}.so";
         }
-      ) parsers;
+      ) parsers)
+      //
+        # Query directory symlinks (highlights.scm, indents.scm, etc.)
+        (builtins.listToAttrs (
+          builtins.concatMap (
+            lang:
+            if builtins.pathExists (tsQueries + "/${lang}") then
+              [
+                {
+                  name = "nvim/site/queries/${lang}";
+                  value = {
+                    source = "${tsQueries}/${lang}";
+                    recursive = true;
+                  };
+                }
+              ]
+            else
+              [ ]
+          ) queryLangs
+        ));
 
     xdg.configFile."nvim" = lib.mkIf (pkgs ? my-nvim-kickstart) {
       source = config.lib.file.mkOutOfStoreSymlink "${pkgs.my-nvim-kickstart}";

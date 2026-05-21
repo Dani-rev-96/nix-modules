@@ -167,7 +167,8 @@ vim.o.scrolloff = 10
 vim.o.confirm = true
 
 -- [[ Native Treesitter (Neovim 0.12+) ]]
--- Parser .so files are provided via Nix (symlinked to ~/.local/share/nvim/site/parser/).
+-- Parser .so files and query .scm files are provided via Nix
+-- (symlinked to ~/.local/share/nvim/site/parser/ and ~/.local/share/nvim/site/queries/).
 -- This ensures both the main process AND neotest's subprocess can find parsers.
 local ensure_parsers = {
   'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline',
@@ -188,6 +189,7 @@ vim.api.nvim_create_autocmd('FileType', {
     end
     if pcall(vim.treesitter.start, args.buf) then
       vim.bo[args.buf].indentexpr = "v:lua.require'vim.treesitter'.indentexpr()"
+      end
     end
   end,
 })
