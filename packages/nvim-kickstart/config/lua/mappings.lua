@@ -43,11 +43,7 @@ map({ 'n', 't' }, '<A-i>', function()
   require('nvchad.term').toggle { pos = 'float', id = 'floatTerm' }
 end, { desc = 'terminal toggle floating term' })
 
-map('i', '<C-J>', 'copilot#Accept("\\<CR>")', {
-  expr = true,
-  silent = true,
-  replace_keycodes = false,
-  desc = 'accept copilot suggestion',
-})
-
-vim.g.copilot_no_tab_map = true
+-- CodeCompanion
+map({ 'n', 'v' }, '<C-a>', '<cmd>CodeCompanionActions<cr>', { desc = 'CodeCompanion actions' })
+map({ 'n', 'v' }, '<leader>cc', '<cmd>CodeCompanionChat Toggle<cr>', { desc = 'CodeCompanion chat toggle' })
+map('v', 'ga', '<cmd>CodeCompanionChat Add<cr>', { desc = 'CodeCompanion add to chat' })
