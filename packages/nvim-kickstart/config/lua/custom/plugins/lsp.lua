@@ -88,7 +88,7 @@ local attach_callback = function(event)
   -- Jump to the type of the word under your cursor.
   --  Useful when you're not sure what type a variable is and you want to see
   --  the definition of its *type*, not where it was *defined*.
-  map('grt', require('fzf-lua').lsp_type_definitions, '[G]oto [T]ype Definition')
+  map('grt', require('fzf-lua').lsp_typedefs, '[G]oto [T]ype Definition')
 
   if client and client.name == 'ts_ls' then
     map('gro', function()
