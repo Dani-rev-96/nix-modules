@@ -428,21 +428,21 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sf', fzf.files, { desc = '[S]earch [F]iles' })
       -- Grep / search
       vim.keymap.set('n', '<leader>sg', fzf.live_grep, { desc = '[S]earch by [G]rep' })
-      vim.keymap.set('n', '<leader>sw', fzf.grep_word, { desc = '[S]earch current [W]ord' })
+      vim.keymap.set('n', '<leader>sw', fzf.grep_cword, { desc = '[S]earch current [W]ord' })
       -- Diagnostics
-      vim.keymap.set('n', '<leader>sd', fzf.diagnostics, { desc = '[S]earch [D]iagnostics' })
+      vim.keymap.set('n', '<leader>sd', fzf.diagnostics_workspace, { desc = '[S]earch [D]iagnostics' })
       -- Recent files
       vim.keymap.set('n', '<leader>s.', fzf.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       -- Buffers
       vim.keymap.set('n', '<leader><leader>', fzf.buffers, { desc = '[ ] Find existing buffers' })
       -- Help
-      vim.keymap.set('n', '<leader>sh', fzf.help, { desc = '[S]earch [H]elp' })
+      vim.keymap.set('n', '<leader>sh', fzf.help_tags, { desc = '[S]earch [H]elp' })
       -- Keymaps
       vim.keymap.set('n', '<leader>sk', fzf.keymaps, { desc = '[S]earch [K]eymaps' })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
-        fzf.current_buffer {
+        fzf.blines {
           previewer = false,
         }
       end, { desc = '[/] Fuzzily search in current buffer' })
