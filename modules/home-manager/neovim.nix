@@ -70,7 +70,10 @@ in
         # nvim-treesitter source for query files (highlights, indents, injections, etc.)
         tsQueries = "${pkgs.vimPlugins.nvim-treesitter}/runtime/queries";
         # Languages that need query files (not bundled with Neovim 0.12 runtime)
+        # Includes both language-specific queries AND shared/virtual query directories
+        # that are used via `; inherits:` directives (e.g., vue inherits html_tags).
         queryLangs = [
+          # Language-specific query directories
           "typescript"
           "javascript"
           "vue"
@@ -81,11 +84,18 @@ in
           "java"
           "bash"
           "diff"
-          "jsdoc"
-          "jsx"
+          # Shared/virtual query directories (no parser, only queries)
+          "ecma" # used by: javascript, qmljs, glimmer_javascript
+          "jsx" # used by: typescript, tsx
           "tsx"
-          "regex"
-          "ecma"
+          "jsdoc" # injected by ecma for JSDoc comments
+          "regex" # injected by ecma, query for regex patterns
+          "html_tags" # used by: vue, angular, blade, svelte, astro, html (indents)
+          "php_only" # used by: php (highlights/indents/injections)
+          "gotmpl" # used by: helm (indents/injections/locals/folds)
+          "hcl" # used by: terraform (indents/injections)
+          "printf" # injected by c/cpp for printf format strings
+          "doxygen" # injected by c/cpp for Doxygen comments
         ];
       in
       # Parser .so symlinks
