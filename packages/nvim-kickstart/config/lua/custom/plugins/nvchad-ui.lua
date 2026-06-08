@@ -17,5 +17,4 @@ return {
   },
 
   'nvchad/volt', -- optional, needed for theme switcher
-  -- or just use Telescope themes
 }

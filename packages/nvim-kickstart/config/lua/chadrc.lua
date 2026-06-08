@@ -19,8 +19,6 @@ local options = {
       format_colors = { lsp = true, icon = '󱓻' },
     },
 
-    telescope = { style = 'borderless' }, -- borderless / bordered
-
     statusline = {
       enabled = true,
       theme = 'default', -- default/vscode/vscode_colored/minimal

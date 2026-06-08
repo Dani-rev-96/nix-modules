@@ -14,9 +14,8 @@ end, { desc = 'buffer close' })
 
 map('n', '<leader>tc', '<cmd>NvCheatsheet<CR>', { desc = 'toggle nvcheatsheet' })
 
-map('n', '<leader>sGc', '<cmd>Telescope git_commits<CR>', { desc = '[G]it [C]ommits' })
-map('n', '<leader>sGt', '<cmd>Telescope git_status<CR>', { desc = '[G]it [S]tatus' })
-map('n', '<leader>st', '<cmd>Telescope terms<CR>', { desc = '[S]earch [T]erminal' })
+map('n', '<leader>sGc', function() require('fzf-lua').git_commits() end, { desc = '[G]it [C]ommits' })
+map('n', '<leader>sGt', function() require('fzf-lua').git_status() end, { desc = '[G]it [S]tatus' })
 
 -- terminal
 map('t', '<C-x>', '<C-\\><C-N>', { desc = 'terminal escape terminal mode' })

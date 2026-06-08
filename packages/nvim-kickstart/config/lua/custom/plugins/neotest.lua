@@ -5,7 +5,6 @@ return {
       'nvim-neotest/nvim-nio',
       'nvim-lua/plenary.nvim',
       'antoinemadec/FixCursorHold.nvim',
-      'nvim-telescope/telescope.nvim',
       'marilari88/neotest-vitest',
       'thenbe/neotest-playwright',
       'rcasia/neotest-java',
