@@ -3,7 +3,11 @@ return {
     'olimorris/codecompanion.nvim',
     dependencies = {
       'nvim-lua/plenary.nvim',
-      'nvim-treesitter/nvim-treesitter',
+      -- NOTE: Do NOT depend on 'nvim-treesitter/nvim-treesitter' here.
+      -- Loading that plugin registers custom query predicate/directive handlers
+      -- (query_predicates.lua) that conflict with Neovim 0.12's native treesitter
+      -- injection processing, crashing on html_tags injections in .vue files.
+      -- CodeCompanion works with the native parsers provided via Nix.
     },
     opts = {
       adapters = {
