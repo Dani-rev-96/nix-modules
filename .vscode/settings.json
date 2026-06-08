@@ -3,6 +3,8 @@
   "chat.tools.terminal.autoApprove": {
     "\\sed": true,
     "\\cat": true,
-    "\\ls": true
+    "\\ls": true,
+    "nix": true,
+    "\\grep": true
   }
 }

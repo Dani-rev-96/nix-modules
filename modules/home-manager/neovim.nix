@@ -48,6 +48,22 @@ in
     # Avoids conflicts with Neovim 0.12's native treesitter (no nvim-treesitter plugin runtime).
     xdg.dataFile =
       let
+        # The orgmode plugin ships its own treesitter grammar but compiles it at
+        # runtime via a C compiler (which our Neovim env intentionally lacks).
+        # Build it declaratively instead and symlink it outside orgmode's own
+        # parser dir, so orgmode detects it as installed and skips compilation.
+        # Tag must match orgmode's required grammar version (`required_version`
+        # in orgmode/utils/treesitter/install.lua).
+        orgParser = pkgs.tree-sitter.buildGrammar {
+          language = "org";
+          version = "2.0.4";
+          src = pkgs.fetchFromGitHub {
+            owner = "nvim-orgmode";
+            repo = "tree-sitter-org";
+            rev = "2.0.4";
+            hash = "sha256-76ImC8GMW+yAKG++AHryUi+MYTmtJ5ogygC+bgNMErA=";
+          };
+        };
         parsers = with pkgs.vimPlugins.nvim-treesitter-parsers; {
           inherit
             typescript
@@ -105,6 +121,11 @@ in
           source = "${drv}/parser/${name}.so";
         }
       ) parsers)
+      //
+        # orgmode grammar (buildGrammar outputs the .so directly at $out/parser)
+        {
+          "nvim/site/parser/org.so".source = "${orgParser}/parser";
+        }
       //
         # Query directory symlinks (highlights.scm, indents.scm, etc.)
         (builtins.listToAttrs (

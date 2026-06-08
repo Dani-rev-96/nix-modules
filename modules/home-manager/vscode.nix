@@ -128,6 +128,7 @@ in
               [
                 kisstkondoros.vscode-codemetrics
                 ahmadalli.vscode-nginx-conf
+                johnny-zhao.oai-compatible-copilot
               ]
             );
             filterAvailable =
@@ -180,6 +181,7 @@ in
           "java.jdt.ls.vmargs" =
             "--add-opens=jdk.jdi/com.sun.tools.jdi=ALL-UNNAMED -XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:disable";
           "dev.containers.dockerPath" = "podman";
+          "oaicopilot.baseUrl" = "https://lemonade.dani-home.de/v1";
         }
         // lib.optionalAttrs cfg.vim {
           "vim.useSystemClipboard" = true;
