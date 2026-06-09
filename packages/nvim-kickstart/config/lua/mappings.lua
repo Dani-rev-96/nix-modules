@@ -46,3 +46,14 @@ end, { desc = 'terminal toggle floating term' })
 map({ 'n', 'v' }, '<C-a>', '<cmd>CodeCompanionActions<cr>', { desc = 'CodeCompanion actions' })
 map({ 'n', 'v' }, '<leader>cc', '<cmd>CodeCompanionChat Toggle<cr>', { desc = 'CodeCompanion chat toggle' })
 map('v', 'ga', '<cmd>CodeCompanionChat Add<cr>', { desc = 'CodeCompanion add to chat' })
+
+-- Minuet AI (code completion)
+-- Virtual text keymaps are configured in minuet-ai.lua:
+--   <A-A>  accept whole completion
+--   <A-a>  accept one line
+--   <A-z>  accept N lines
+--   <A-[>  previous completion / manual trigger
+--   <A-]>  next completion / manual trigger
+--   <A-e>  dismiss
+-- blink.cmp manual trigger is configured in lsp.lua:
+--   <A-y>  manually invoke minuet completion
