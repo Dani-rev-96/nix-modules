@@ -105,7 +105,7 @@ return {
 
         -- Notification level: only show warnings and errors.
         notify = 'warn',
-      },
+      }
     end,
   },
 }
