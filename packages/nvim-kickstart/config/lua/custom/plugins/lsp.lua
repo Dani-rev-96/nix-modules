@@ -37,7 +37,7 @@ local attach_callback = function(event)
 
   -- Execute a code action, usually your cursor needs to be on top of an error
   -- or a suggestion from your LSP for this to activate.
-  map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
+  map('gra', require('fzf-lua').lsp_code_actions, '[G]oto Code [A]ction', { 'n', 'x' })
 
   -- Find references for the word under your cursor.
   map('grr', require('fzf-lua').lsp_references, '[G]oto [R]eferences')
@@ -49,33 +49,33 @@ local attach_callback = function(event)
   -- Jump to the definition of the word under your cursor.
   --  This is where a variable was first declared, or where a function is defined, etc.
   --  To jump back, press <C-t>.
-  -- map('grd', require('fzf-lua').lsp_definitions, '[G]oto [D]efinition')
+  map('grd', require('fzf-lua').lsp_definitions, '[G]oto [D]efinition')
   --
-  map('grd', function()
-    vim.lsp.buf.definition {
-      on_list = function(options)
-        -- Save position in jumplist so <C-o> works after any navigation
-        vim.cmd "normal! m'"
-        local from = { vim.fn.bufnr '%', vim.fn.line '.', vim.fn.col '.', 0 }
-        vim.fn.settagstack(vim.fn.win_getid(), { items = { { tagname = vim.fn.expand '<cword>', from = from } } }, 't')
-
-        if #options.items == 1 then
-          local item = options.items[1]
-          local b = vim.fn.bufadd(item.filename)
-          vim.bo[b].buflisted = true
-          vim.api.nvim_win_set_buf(0, b)
-          vim.api.nvim_win_set_cursor(0, { item.lnum, item.col - 1 })
-        else
-          vim.fn.setqflist({}, ' ', options)
-          require('fzf-lua').quickfix { prompt_title = 'LSP Definitions' }
-        end
-      end,
-    }
-  end, '[G]oto [D]efinition')
+  -- map('grd', function()
+  --   vim.lsp.buf.definition {
+  --     on_list = function(options)
+  --       -- Save position in jumplist so <C-o> works after any navigation
+  --       vim.cmd "normal! m'"
+  --       local from = { vim.fn.bufnr '%', vim.fn.line '.', vim.fn.col '.', 0 }
+  --       vim.fn.settagstack(vim.fn.win_getid(), { items = { { tagname = vim.fn.expand '<cword>', from = from } } }, 't')
+  --
+  --       if #options.items == 1 then
+  --         local item = options.items[1]
+  --         local b = vim.fn.bufadd(item.filename)
+  --         vim.bo[b].buflisted = true
+  --         vim.api.nvim_win_set_buf(0, b)
+  --         vim.api.nvim_win_set_cursor(0, { item.lnum, item.col - 1 })
+  --       else
+  --         vim.fn.setqflist({}, ' ', options)
+  --         require('fzf-lua').quickfix { prompt_title = 'LSP Definitions' }
+  --       end
+  --     end,
+  --   }
+  -- end, '[G]oto [D]efinition')
 
   -- WARN: This is not Goto Definition, this is Goto Declaration.
   --  For example, in C this would take you to the header.
-  map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+  map('grD', require('fzf-lua').lsp_declarations, '[G]oto [D]eclaration')
 
   -- Fuzzy find all the symbols in your current document.
   --  Symbols are things like variables, functions, types, etc.
