@@ -23,34 +23,34 @@ return {
             end_point = 'https://lemonade.dani-home.de/v1/chat/completions',
             model = 'Qwopus3.5-4B-Coder-MTP',
             api_key = 'LEMONADE_API_KEY',
-            reasoning = { effort = 'none' }, -- or "minimal", depending on the model (OpenRouter)
-            reasoning_effort = 'none', -- or "minimal", depending on the model (various providers)
-            thinking = { type = 'disabled' }, -- DeepSeek API
             stream = true,
-            -- template = {
-            --     prompt = function(context_before_cursor, context_after_cursor, _)
-            --         return '<|fim_prefix|>'
-            --             .. context_before_cursor
-            --             .. '<|fim_suffix|>'
-            --             .. context_after_cursor
-            --             .. '<|fim_middle|>'
-            --     end,
-            --     suffix = false,
-            -- },
+            -- `optional` is merged verbatim into the request body. Put any extra
+            -- OpenAI-compatible parameters HERE, not at the provider top level
+            -- (where minuet silently ignores them).
+            optional = {
+              -- Cap output length to avoid request timeouts from long responses.
+              max_tokens = 512,
+              -- Qwopus3.5-4B-Coder-MTP is Qwen3.5-based and enables "thinking"
+              -- by default. Disable it ONLY for minuet's requests (not globally
+              -- in llama.cpp) via the Qwen chat-template flag, which llama.cpp
+              -- forwards into the prompt template:
+              chat_template_kwargs = { enable_thinking = false },
+            },
           },
         },
 
         -- --- blink.cmp integration ---
-        -- Add minuet as a blink.cmp source (configured in lsp.lua below).
-        -- Manual trigger via <A-y> (no conflict with existing mappings).
+        -- minuet is registered as a blink.cmp provider in lsp.lua, but it is
+        -- intentionally NOT in `sources.default`, so it only runs on manual
+        -- request (not on every keystroke). This is why `:Minuet` / blink status
+        -- lists it under "Disabled sources" — that is expected and correct.
         --
-        -- blink.cmp source is registered in lsp.lua's blink.cmp opts:
-        --   providers = {
-        --     minuet = { name = 'minuet', module = 'minuet.blink', ... }
-        --   }
-        --
-        -- Manual trigger keymap is set in lsp.lua's blink.cmp keymap:
-        --   ['<A-y>'] = require('minuet').make_blink_map()
+        -- The manual trigger is set as a plain insert-mode keymap in this file's
+        -- `config` (above the setup call), because blink.cmp v1's keymap table
+        -- only accepts its built-in command strings, not arbitrary functions:
+        --   vim.keymap.set('i', '<A-y>', function()
+        --     require('blink.cmp').show { providers = { 'minuet' } }
+        --   end)
 
         -- --- Virtual text frontend ---
         -- Shows inline suggestions as virtual text. Keymaps don't conflict
@@ -96,7 +96,9 @@ return {
         -- responsiveness reasonable for a cloud model.
         throttle = 1500,
         debounce = 600,
-        request_timeout = 3,
+        -- Max seconds to wait for a completion. Keep in sync with the blink
+        -- `minuet` provider's `timeout_ms` (request_timeout * 1000) in lsp.lua.
+        request_timeout = 5,
 
         -- Number of completion items to request per invocation.
         n_completions = 3,

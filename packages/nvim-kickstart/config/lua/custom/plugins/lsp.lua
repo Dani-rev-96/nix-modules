@@ -782,7 +782,7 @@ return {
             module = 'minuet.blink',
             async = true,
             -- Must match minuet.config.request_timeout * 1000
-            timeout_ms = 3000,
+            timeout_ms = 5000,
             -- Higher priority among suggestions
             score_offset = 50,
           },
