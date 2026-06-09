@@ -744,11 +744,6 @@ return {
         -- See :h blink-cmp-config-keymap for defining your own keymap
         preset = 'default',
 
-        -- Minuet: manually invoke AI-powered code completion
-        -- Wrapped in a function to defer evaluation until the keymap is actually used,
-        -- so that minuet is guaranteed to be loaded by lazy.nvim first.
-        ['<A-y>'] = require('minuet').make_blink_map(),
-
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
       },

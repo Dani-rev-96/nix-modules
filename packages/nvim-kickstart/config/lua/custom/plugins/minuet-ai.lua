@@ -7,6 +7,12 @@ return {
       'saghen/blink.cmp',
     },
     config = function()
+      -- Manually trigger minuet completions via blink.cmp
+      -- (Set here because blink.cmp's keymap config only accepts built-in command strings)
+      vim.keymap.set('i', '<A-y>', function()
+        require('blink.cmp').show { providers = { 'minuet' } }
+      end, { desc = 'Minuet: show AI completions' })
+
       require('minuet').setup {
         -- Use the same openai_compatible provider as CodeCompanion so both
         -- AI features share the same backend (same endpoint, same API key).
