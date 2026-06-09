@@ -443,7 +443,7 @@ require('lazy').setup({
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
         fzf.blines {
-          previewer = false,
+          previewer = true,
         }
       end, { desc = '[/] Fuzzily search in current buffer' })
 
