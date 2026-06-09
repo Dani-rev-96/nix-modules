@@ -19,7 +19,7 @@ return {
             api_key = 'LEMONADE_API_KEY',
             reasoning = { effort = 'none' }, -- or "minimal", depending on the model (OpenRouter)
             reasoning_effort = 'none', -- or "minimal", depending on the model (various providers)
-            thinking = { type = 'disabled' } -- DeepSeek API
+            thinking = { type = 'disabled' }, -- DeepSeek API
             stream = true,
             -- template = {
             --     prompt = function(context_before_cursor, context_after_cursor, _)

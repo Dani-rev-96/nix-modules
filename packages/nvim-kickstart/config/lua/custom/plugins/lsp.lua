@@ -745,7 +745,9 @@ return {
         preset = 'default',
 
         -- Minuet: manually invoke AI-powered code completion
-        ['<A-y>'] = require('minuet').make_blink_map(),
+        -- Wrapped in a function to defer evaluation until the keymap is actually used,
+        -- so that minuet is guaranteed to be loaded by lazy.nvim first.
+        ['<A-y>'] = function() return require('minuet').make_blink_map() end,
 
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
