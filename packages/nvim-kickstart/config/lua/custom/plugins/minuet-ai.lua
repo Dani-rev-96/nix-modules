@@ -102,10 +102,17 @@ return {
             max_tokens = 512,
           },
         },
+        ['qwen35-4b-instruct-mtp-mxfp4'] = {
+          model = 'qwen35-4b-instruct-mtp-mxfp4',
+          optional = {
+            -- Cap output length to avoid request timeouts from long responses.
+            max_tokens = 512,
+          },
+        },
       }
 
       -- >>> Change this one line to switch models. <<<
-      local active_model = 'Qwen3-4B-Instruct-2507'
+      local active_model = 'qwen35-4b-instruct-mtp-mxfp4'
 
       require('minuet').setup {
         -- Use the same openai_compatible provider as CodeCompanion so both
