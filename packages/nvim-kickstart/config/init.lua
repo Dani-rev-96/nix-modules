@@ -194,7 +194,7 @@ for _, lang in ipairs(ensure_parsers) do
   pcall(vim.treesitter.language.add, lang)
 end
 
--- Enable treesitter highlighting and indentation for all buffers with a parser available.
+-- Enable treesitter highlighting for all buffers with a parser available.
 vim.api.nvim_create_autocmd('FileType', {
   group = vim.api.nvim_create_augroup('kickstart-treesitter', { clear = true }),
   callback = function(args)
@@ -202,9 +202,9 @@ vim.api.nvim_create_autocmd('FileType', {
     if args.match == 'markdown' then
       return
     end
-    if pcall(vim.treesitter.start, args.buf) then
-      vim.bo[args.buf].indentexpr = "v:lua.require'vim.treesitter'.indentexpr()"
-    end
+
+    -- Do not force treesitter indentexpr globally; fallback to filetype indent rules.
+    pcall(vim.treesitter.start, args.buf)
   end,
 })
 
