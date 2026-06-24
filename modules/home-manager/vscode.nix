@@ -154,6 +154,7 @@ in
 
         enableUpdateCheck = false;
         enableExtensionUpdateCheck = false;
+        mutableExtensionsDir = true;
         userSettings = {
           "workbench.iconTheme" = "vscode-icons";
           "workbench.colorTheme" = "Default Dark Modern";
