@@ -37,6 +37,7 @@ in
   config = lib.mkIf cfg.enable {
     programs.vscode = {
       enable = true;
+      mutableExtensionsDir = true;
       profiles.default = {
         extensions =
           let
@@ -154,7 +155,6 @@ in
 
         enableUpdateCheck = false;
         enableExtensionUpdateCheck = false;
-        mutableExtensionsDir = true;
         userSettings = {
           "workbench.iconTheme" = "vscode-icons";
           "workbench.colorTheme" = "Default Dark Modern";
