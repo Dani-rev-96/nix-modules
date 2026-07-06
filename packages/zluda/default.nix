@@ -12,19 +12,19 @@
   libedit,
   rustPlatform,
   stdenv,
-  pkg-config,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "zluda";
-  version = "6-preview.20260308";
+  version = "6";
 
   src = fetchFromGitHub {
     owner = "vosen";
     repo = "ZLUDA";
-    rev = "796ad6ca1d13a0d9a071ccb515a850ea610959c9";
-    hash = "sha256-CkRFor6wPqthiM/PDqh65quVu9y/PQPWmVjWCuVkqOI=";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-ev6ne+PWWg2Gk8N+TL9Osy5AOrruS6eDbyh+HxnhSn8=";
     fetchSubmodules = true;
+    fetchLFS = true;
   };
 
   buildInputs = [
@@ -35,13 +35,12 @@ rustPlatform.buildRustPackage rec {
     rocmPackages.rocsolver
     rocmPackages.rocblas
     rocmPackages.hipblas
+    rocmPackages.hipblaslt
     rocmPackages.rocm-cmake
     rocmPackages.hipfft
-    rocmPackages.hipblaslt
     zlib
     libxml2
     libedit
-    pkg-config
   ];
 
   nativeBuildInputs = [
@@ -52,22 +51,23 @@ rustPlatform.buildRustPackage rec {
     clang
   ];
 
-  cargoHash = "sha256-1xnkpskyq/JmbgpY4bCTEiz4uEFp66TtRIbpIFWiuvo=";
+  cargoHash = "sha256-2YAlc8HW+aqfRzLSXw/I++DM4/JneE7UNmV6BVZb4VM=";
+
+  # Tests require a GPU and segfault in the sandbox
+  doCheck = false;
 
   # xtask doesn't support passing --target, but nix hooks expect the folder structure from when it's set
   env.CARGO_BUILD_TARGET = stdenv.hostPlatform.rust.cargoShortTarget;
+  # Future packagers:
+  # This is a fix for https://github.com/NixOS/nixpkgs/issues/390469. Ideally
+  # ZLUDA should configure this automatically. Therefore, on every new update,
+  # please try removing this line and see if ZLUDA builds.
   env.CMAKE_BUILD_TYPE = "Release";
-
-  # cmakeFlags = [
-  #   "-DCMAKE_BUILD_TYPE=Release"
-  # ];
 
   preConfigure = ''
     # disable test written for windows only: https://github.com/vosen/ZLUDA/blob/774f4bcb37c39f876caf80ae0d39420fa4bc1c8b/zluda_inject/tests/inject.rs#L55
-    rm -r zluda_inject/tests
+    rm zluda_inject/tests/inject.rs
   '';
-
-  doCheck = false;
 
   buildPhase = ''
     runHook preBuild
@@ -79,18 +79,15 @@ rustPlatform.buildRustPackage rec {
     mkdir -p $out/lib/
     find target/release/ -maxdepth 1 -type l -name '*.so*' -exec \
       cp --recursive --no-clobber --target-directory=$out/lib/ {} +
-    mkdir -p $out/include/
-    find target/ -maxdepth 3 -type l -name '*.h*' -exec \
-      cp --recursive --no-clobber --target-directory=$out/include/ {} +
   '';
 
   meta = {
-    description = "ZLUDA - CUDA on non-Nvidia GPUs";
+    description = "CUDA on non-Nvidia GPUs";
     homepage = "https://github.com/vosen/ZLUDA";
-    changelog = "https://github.com/vosen/ZLUDA/releases/tag/${src.rev}";
+    changelog = "https://github.com/vosen/ZLUDA/releases/tag/${finalAttrs.src.rev}";
     license = lib.licenses.mit;
     maintainers = [
       lib.maintainers.errnoh
     ];
   };
-}
+})
