@@ -3,10 +3,15 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs =
-    { self, nixpkgs }:
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
     {
       # ── Exportable NixOS / home-manager modules ──────────────────────────────
       # Usage:
@@ -24,5 +29,20 @@
           zluda_custom = prev.callPackage ./packages/zluda { };
         };
       };
-    };
+
+    }
+    // flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+        zluda_custom = pkgs.callPackage ./packages/zluda { };
+      in
+      {
+        packages = {
+
+          zluda_custom = zluda_custom;
+        };
+      }
+    );
+
 }

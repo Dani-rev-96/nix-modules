@@ -1,4 +1,5 @@
 {
+  pkgs,
   lib,
   fetchFromGitHub,
   rocmPackages,
@@ -18,14 +19,22 @@ rustPlatform.buildRustPackage (finalAttrs: {
   pname = "zluda";
   version = "6";
 
-  src = fetchFromGitHub {
-    owner = "vosen";
-    repo = "ZLUDA";
+  src = pkgs.fetchgit {
+    url = "https://github.com/vosen/ZLUDA.git";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-ev6ne+PWWg2Gk8N+TL9Osy5AOrruS6eDbyh+HxnhSn8=";
+    hash = "sha256-5+ip6YGIgGH892UzcP/3vHoxRD0YpUNTkryNDg9gojs=";
     fetchSubmodules = true;
     fetchLFS = true;
   };
+
+  # src = fetchFromGitHub {
+  #   owner = "vosen";
+  #   repo = "ZLUDA";
+  #   rev = "v${finalAttrs.version}";
+  #   hash = "sha256-ev6ne+PWWg2Gk8N+TL9Osy5AOrruS6eDbyh+HxnhSn8=";
+  #   fetchSubmodules = true;
+  #   fetchLFS = true;
+  # };
 
   buildInputs = [
     rocmPackages.clr
