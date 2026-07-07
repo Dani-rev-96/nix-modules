@@ -51,7 +51,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     clang
   ];
 
-  cargoHash = "sha256-2YAlc8HW+aqfRzLSXw/I++DM4/JneE7UNmV6BVZb4VM=";
+  cargoHash = "sha256-q5DagH0USWZNni0UrwHzeHe4LpaOCHU0ffOek7PUz50=";
 
   # Tests require a GPU and segfault in the sandbox
   doCheck = false;
