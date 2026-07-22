@@ -15,6 +15,12 @@ in
   options.dani-modules.vscode = {
     enable = lib.mkEnableOption "dani-modules VSCode setup";
 
+    package = lib.mkOption {
+      type = lib.types.package;
+      default = pkgs.vscode;
+      description = "Font size for editor and terminal.";
+    };
+
     fontSize = lib.mkOption {
       type = lib.types.int;
       default = 12;
@@ -38,6 +44,7 @@ in
     programs.vscode = {
       enable = true;
       mutableExtensionsDir = true;
+      package = cfg.package;
       profiles.default = {
         extensions =
           let
@@ -219,10 +226,6 @@ in
             when = "inlineSuggestionVisible && editorTextFocus";
           }
           {
-            key = "ctrl+y";
-            command = "-redo";
-          }
-          {
             key = "ctrl+j";
             command = "chatEditor.action.acceptHunk";
             when = "chatEdits.cursorInChangeRange && chatEdits.hasEditorModifications && editorFocus && !chatEdits.isCurrentlyBeingModified || chatEdits.cursorInChangeRange && chatEdits.hasEditorModifications && notebookCellListFocused && !chatEdits.isCurrentlyBeingModified";
@@ -251,10 +254,6 @@ in
             key = "ctrl+r";
             command = "redo";
             when = "editorTextFocus && vim.mode == 'Normal'";
-          }
-          {
-            key = "ctrl+z";
-            command = "-undo";
           }
         ];
       };
