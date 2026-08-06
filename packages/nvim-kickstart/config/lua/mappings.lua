@@ -42,10 +42,13 @@ map({ 'n', 't' }, '<A-i>', function()
   require('nvchad.term').toggle { pos = 'float', id = 'floatTerm' }
 end, { desc = 'terminal toggle floating term' })
 
--- CodeCompanion
-map({ 'n', 'v' }, '<C-a>', '<cmd>CodeCompanionActions<cr>', { desc = 'CodeCompanion actions' })
-map({ 'n', 'v' }, '<leader>cc', '<cmd>CodeCompanionChat Toggle<cr>', { desc = 'CodeCompanion chat toggle' })
-map('v', 'ga', '<cmd>CodeCompanionChat Add<cr>', { desc = 'CodeCompanion add to chat' })
+-- CodeCompanion (chat) — only mapped when the self-hosted chat backend is
+-- active, since these commands only exist while codecompanion.nvim is loaded.
+if vim.g.ai_chat == 'codecompanion' then
+  map({ 'n', 'v' }, '<C-a>', '<cmd>CodeCompanionActions<cr>', { desc = 'CodeCompanion actions' })
+  map({ 'n', 'v' }, '<leader>cc', '<cmd>CodeCompanionChat Toggle<cr>', { desc = 'CodeCompanion chat toggle' })
+  map('v', 'ga', '<cmd>CodeCompanionChat Add<cr>', { desc = 'CodeCompanion add to chat' })
+end
 
 -- Minuet AI (code completion)
 -- Virtual text keymaps are configured in minuet-ai.lua:

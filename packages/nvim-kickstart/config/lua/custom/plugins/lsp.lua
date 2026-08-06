@@ -772,22 +772,43 @@ return {
         },
       },
 
-      sources = {
-        default = { 'lsp', 'path', 'snippets', 'lazydev' },
-
-        providers = {
+      sources = (function()
+        local default = { 'lsp', 'path', 'snippets', 'lazydev' }
+        local providers = {
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
-          minuet = {
+        }
+
+        -- The AI completion source is chosen per project in init.lua and only
+        -- registered when its plugin is actually loaded, so the provider never
+        -- dangles for `none` projects (or the non-selected engine).
+        if vim.g.ai_completion == 'minuet' then
+          -- Manual-trigger only: NOT added to `default`, invoked via <A-y>
+          -- (see minuet-ai.lua) so the self-hosted LLM isn't hit on every key.
+          providers.minuet = {
             name = 'minuet',
             module = 'minuet.blink',
             async = true,
-            -- Must match minuet.config.request_timeout * 1000
-            timeout_ms = 5000,
+            -- Generous upper bound covering the largest per-model
+            -- request_timeout in minuet-ai.lua (currently 10s for the FIM
+            -- default). minuet's own request_timeout is the real deadline.
+            timeout_ms = 12000,
             -- Higher priority among suggestions
             score_offset = 50,
-          },
-        },
-      },
+          }
+        elseif vim.g.ai_completion == 'copilot' then
+          -- Auto source: Copilot suggestions appear inline in the blink menu.
+          providers.copilot = {
+            name = 'copilot',
+            module = 'blink-copilot',
+            async = true,
+            -- Rank Copilot above LSP/snippet items in the menu.
+            score_offset = 100,
+          }
+          table.insert(default, 'copilot')
+        end
+
+        return { default = default, providers = providers }
+      end)(),
 
       -- Show documentation when selecting a completion item
 

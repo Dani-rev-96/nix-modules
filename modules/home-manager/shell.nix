@@ -36,6 +36,13 @@ in
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
       history.size = 9999999;
+      shellAliases = {
+        # Per-project AI provider override for Neovim (see nvim init.lua resolver).
+        # NVIM_AI takes precedence over any .nvim-profile file.
+        nvim-copilot = "NVIM_AI=copilot nvim";
+        nvim-minuet = "NVIM_AI=minuet nvim";
+        nvim-noai = "NVIM_AI=none nvim";
+      };
     };
   };
 }

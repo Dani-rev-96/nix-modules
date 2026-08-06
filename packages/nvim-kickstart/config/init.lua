@@ -93,6 +93,82 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
+-- [[ Per-project AI provider selection ]]
+-- Decide which AI stack to load BEFORE plugins are configured, so lazy.nvim's
+-- `enabled` guards (and the blink source registration in lsp.lua) can gate the
+-- relevant plugins. This MUST run before `require('lazy').setup(...)`.
+--
+-- Native project config ('exrc' / .nvim.lua) is intentionally NOT used for this:
+-- it is sourced only AFTER init.lua finishes, i.e. after lazy has already
+-- evaluated every plugin's `enabled` field, so it is too late to gate loading.
+-- A plain-text `.nvim-profile` (data only, validated against an allowlist) and an
+-- env var are both read here at the top of init.lua, before lazy runs.
+--
+-- One "mode" drives two independent axes:
+--   vim.g.ai_completion : inline completion engine ('copilot' | 'minuet' | nil)
+--   vim.g.ai_chat       : chat backend            ('copilot' | 'codecompanion' | nil)
+--
+-- Selection order (first match wins):
+--   1. $NVIM_AI environment variable (great with direnv / one-off overrides)
+--   2. a `.nvim-profile` file, searched upward from cwd (stops at $HOME)
+--   3. default: 'none'
+local ai_presets = {
+  none = { completion = nil, chat = nil },
+  copilot = { completion = 'copilot', chat = 'copilot' },
+  minuet = { completion = 'minuet', chat = 'codecompanion' },
+}
+
+local function resolve_ai_mode()
+  -- 1. explicit environment override
+  local env = vim.env.NVIM_AI
+  if env and env ~= '' then
+    return vim.trim(env)
+  end
+
+  -- 2. project-local `.nvim-profile` (plain text, first line = mode)
+  local found = vim.fs.find('.nvim-profile', {
+    upward = true,
+    path = vim.fn.getcwd(),
+    stop = vim.env.HOME,
+    type = 'file',
+  })[1]
+  if found then
+    local ok, lines = pcall(vim.fn.readfile, found, '', 1)
+    if ok and lines[1] then
+      return vim.trim(lines[1])
+    end
+  end
+
+  -- 3. default
+  return 'none'
+end
+
+local ai_mode = resolve_ai_mode()
+if not ai_presets[ai_mode] then
+  vim.schedule(function()
+    vim.notify(
+      ('Unknown AI mode %q (from NVIM_AI or .nvim-profile); falling back to "none". Valid: copilot, minuet, none.'):format(ai_mode),
+      vim.log.levels.WARN
+    )
+  end)
+  ai_mode = 'none'
+end
+
+vim.g.ai_mode = ai_mode
+vim.g.ai_completion = ai_presets[ai_mode].completion
+vim.g.ai_chat = ai_presets[ai_mode].chat
+
+-- Report / debug the active selection with `:AIMode`.
+vim.api.nvim_create_user_command('AIMode', function()
+  local msg = ('AI mode=%s  completion=%s  chat=%s'):format(vim.g.ai_mode or 'none', vim.g.ai_completion or 'off', vim.g.ai_chat or 'off')
+  -- The minuet model is resolved per project in minuet-ai.lua (which sets
+  -- vim.g.minuet_model when it loads), so only show it when relevant.
+  if vim.g.ai_completion == 'minuet' and vim.g.minuet_model then
+    msg = msg .. ('\nminuet model=%s'):format(vim.g.minuet_model)
+  end
+  vim.notify(msg, vim.log.levels.INFO)
+end, { desc = 'Show the active per-project AI provider selection' })
+
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!

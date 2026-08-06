@@ -1,6 +1,9 @@
 return {
   {
     'olimorris/codecompanion.nvim',
+    -- Gated by the per-project AI selection resolved in init.lua.
+    -- Only loads when the active mode selects the self-hosted chat backend.
+    enabled = vim.g.ai_chat == 'codecompanion',
     dependencies = {
       'nvim-lua/plenary.nvim',
       -- NOTE: Do NOT depend on 'nvim-treesitter/nvim-treesitter' here.
