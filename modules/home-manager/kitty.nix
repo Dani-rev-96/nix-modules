@@ -25,12 +25,13 @@ in
       package = pkgs.kitty;
       settings = {
         font_size = cfg.fontSize;
-        # Make the macOS Option key send a real Alt/Meta sequence instead of
-        # composing accented characters (å, », …). Without this, all `<A-…>`
-        # Neovim keymaps (minuet, Copilot, CodeCompanion) silently do nothing
-        # on macOS. Ignored on Linux, so the same config is cross-platform.
-        # Use "left" instead if you want to keep the right Option for compose.
-        macos_option_as_alt = "yes";
+        # macOS: make only the LEFT Option key send a real Alt/Meta sequence,
+        # so `<A-…>` Neovim keymaps (minuet, Copilot, CodeCompanion) work.
+        # The RIGHT Option key keeps its normal composing behaviour, which is
+        # essential on non-US layouts (e.g. German) where coding characters
+        # need Option: { } [ ] | \ @ etc. Ignored on Linux, so the same config
+        # stays cross-platform. Press LEFT Option for the Alt keymaps.
+        macos_option_as_alt = "left";
         wheel_scroll_min_lines = 1;
         confirm_os_window_close = 0;
         scrollback_lines = 999999;
