@@ -32,7 +32,7 @@ in
     programs.fzf.enable = true;
     programs.zsh = {
       enable = true;
-      enableCompletion = false;
+      enableCompletion = true;
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
       history.size = 9999999;
