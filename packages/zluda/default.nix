@@ -17,12 +17,12 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "zluda";
-  version = "6";
+  version = "7-preview.10";
 
   src = pkgs.fetchgit {
     url = "https://github.com/vosen/ZLUDA.git";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-5+ip6YGIgGH892UzcP/3vHoxRD0YpUNTkryNDg9gojs=";
+    hash = "sha256-FP3OBOuSpxf473sWqlLAW1Cu9DJOKtof6VTSOmVlMnw=";
     fetchSubmodules = true;
     fetchLFS = true;
   };
