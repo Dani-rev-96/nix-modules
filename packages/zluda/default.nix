@@ -22,7 +22,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   src = pkgs.fetchgit {
     url = "https://github.com/vosen/ZLUDA.git";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-FP3OBOuSpxf473sWqlLAW1Cu9DJOKtof6VTSOmVlMnw=";
+    hash = "sha256-7oQZKMLfKFDdNkau16lYf6dO/byftShTiSFJ/1Orh10==";
     fetchSubmodules = true;
     fetchLFS = true;
   };
@@ -60,7 +60,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     clang
   ];
 
-  cargoHash = "sha256-q5DagH0USWZNni0UrwHzeHe4LpaOCHU0ffOek7PUz50=";
+  cargoHash = "sha256-/Mf4aqX0E0g1Y1ZAJPhSELdfqm2eYzZVxgW0ZNyLhRU=";
 
   # Tests require a GPU and segfault in the sandbox
   doCheck = false;
@@ -72,6 +72,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
   # ZLUDA should configure this automatically. Therefore, on every new update,
   # please try removing this line and see if ZLUDA builds.
   env.CMAKE_BUILD_TYPE = "Release";
+
+  # nix's fetchers strip the .git directory, so vergen cannot derive the git
+  # sha and `env!("VERGEN_GIT_SHA")` fails to compile. Provide it explicitly.
+  env.VERGEN_GIT_SHA = finalAttrs.src.rev;
 
   preConfigure = ''
     # disable test written for windows only: https://github.com/vosen/ZLUDA/blob/774f4bcb37c39f876caf80ae0d39420fa4bc1c8b/zluda_inject/tests/inject.rs#L55
