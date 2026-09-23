@@ -21,12 +21,13 @@ in
 
   config = lib.mkIf cfg.enable {
     services.xserver.enable = true;
-    services.displayManager.sddm = {
-      enable = true;
-      wayland.enable = cfg.wayland;
-    };
-    services.desktopManager.plasma6.enable = true;
+    # services.displayManager.sddm = {
+    #   enable = true;
+    #   wayland.enable = cfg.wayland;
+    # };
+    services.displayManager.plasma-login-manager.enable = true;
     services.displayManager.defaultSession = "plasma";
+    services.desktopManager.plasma6.enable = true;
 
     programs.kde-pim.merkuro = true;
     programs.kdeconnect = {
