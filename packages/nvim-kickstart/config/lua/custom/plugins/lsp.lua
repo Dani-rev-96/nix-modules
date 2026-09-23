@@ -673,7 +673,9 @@ return {
         bash = { 'shfmt' },
         html = { 'prettierd', 'prettier', stop_after_first = true },
         json = { 'prettierd', 'prettier', stop_after_first = true },
-        ['*'] = { 'codespell' },
+        -- NOTE: do NOT add a ['*'] wildcard formatter here. A wildcard makes conform
+        -- believe every filetype (incl. java) has a formatter, so lsp_format='fallback'
+        -- never falls back to the LSP and <leader>f silently does nothing on Java.
         ['_'] = { 'trim_whitespace' }, -- This will trim trailing whitespace in all files
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
@@ -892,8 +894,10 @@ return {
           java = {
             format = {
               settings = {
+                -- Fallback only; attach_jdtls overrides this with a root_dir-relative
+                -- path per project. Profile name must match the XML <profile name=...>.
                 url = vim.fn.getcwd() .. '/.vscode/java-formatter.xml',
-                profile = 'Default', -- Replace with your profile name from the XML file
+                profile = 'Default', -- matches <profile name="Default"> in java-formatter.xml
               },
             },
             inlayHints = {
@@ -932,6 +936,7 @@ return {
       end
       local function attach_jdtls()
         local fname = vim.api.nvim_buf_get_name(0)
+        local root_dir = opts.root_dir(fname)
         local function extend_or_override(defaults, overrides)
           return vim.tbl_deep_extend('force', defaults or {}, overrides or {})
         end
@@ -939,14 +944,29 @@ return {
         local capabilities = require('blink.cmp').get_lsp_capabilities()
         capabilities.textDocument.completion.completionItem.labelDetailsSupport = true
 
+        -- Resolve the Eclipse formatter profile relative to the project root (not
+        -- vim.fn.getcwd()), so it works no matter which directory nvim was launched
+        -- from. Only override when the file actually exists; otherwise jdtls keeps its
+        -- built-in default rather than pointing at a non-existent path.
+        local settings = vim.deepcopy(opts.settings or {})
+        if root_dir then
+          local formatter = root_dir .. '/.vscode/java-formatter.xml'
+          if (vim.uv or vim.loop).fs_stat(formatter) then
+            settings.java = settings.java or {}
+            settings.java.format = settings.java.format or {}
+            settings.java.format.settings = settings.java.format.settings or {}
+            settings.java.format.settings.url = formatter
+          end
+        end
+
         -- Configuration can be augmented and overridden by opts.jdtls
         local config = extend_or_override({
           cmd = opts.full_cmd(opts),
-          root_dir = opts.root_dir(fname),
+          root_dir = root_dir,
           init_options = {
             bundles = bundles,
           },
-          settings = opts.settings,
+          settings = settings,
           -- enable CMP capabilities
           -- require('blink.cmp')
           -- capabilities = has 'blink.cmp' and require('blink.cmp').default_capabilities() or nil,
