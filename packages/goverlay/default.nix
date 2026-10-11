@@ -169,7 +169,9 @@ stdenv.mkDerivation (finalAttrs: {
     }
   '';
 
-  passthru.updateScript = nix-update-script { };
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--flake" ];
+  };
 
   meta = {
     description = "Open source project that aims to create a Graphical UI to help manage Linux overlays";

@@ -9,3 +9,7 @@ secrets/private-age-key.txt
 !**/*.cred.enc.*
 
 **/*.terragrunt-cache
+
+# nix result symlinks
+result
+result-*

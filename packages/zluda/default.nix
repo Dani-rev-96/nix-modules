@@ -11,6 +11,7 @@
   zlib,
   libxml2,
   libedit,
+  nix-update-script,
   rustPlatform,
   stdenv,
 }:
@@ -93,6 +94,20 @@ rustPlatform.buildRustPackage (finalAttrs: {
     find target/release/ -maxdepth 1 -type l -name '*.so*' -exec \
       cp --recursive --no-clobber --target-directory=$out/lib/ {} +
   '';
+
+  passthru.updateScript = nix-update-script {
+    # Upstream marks the old 'v6' release as 'latest' on GitHub, so plain
+    # release lookup would downgrade this package. Track the newest
+    # 7-preview tag instead; 'preview' counts as unstable for nix-update,
+    # hence --version unstable.
+    extraArgs = [
+      "--flake"
+      "--version"
+      "unstable"
+      "--version-regex"
+      "^v?(7-preview\\.[0-9]+)$"
+    ];
+  };
 
   meta = {
     description = "CUDA on non-Nvidia GPUs";

@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main, unstable]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # Deliberately eval-only: zluda/goverlay build tests run on the
+  # nix-build-infra prebuilder (Strato), not on GitHub runners.
+  # Do not add `nix flake check` here: it would build every package.
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v30
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check formatting
+        run: nix develop --command nixfmt --check $(git ls-files '*.nix')
+      - name: Evaluate flake outputs
+        run: nix flake show --all-systems
+      - name: Evaluate packages (no builds)
+        run: |
+          nix eval --raw .#packages.x86_64-linux.goverlay_latest.version && echo
+          nix eval --raw .#packages.x86_64-linux.zluda_custom.version && echo

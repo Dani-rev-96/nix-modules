@@ -61,7 +61,26 @@ The flake also provides an overlay with custom packages:
 nixpkgs.overlays = [ inputs.nix-modules.overlays.default ];
 ```
 
-Packages: `my-nvim-kickstart`, `opentrack_custom`, `goverlay_latest`, `vulkan-hdr-layer`
+Packages: `my-nvim-kickstart`, `goverlay_latest`, `zluda_custom`
+
+## Package Update Workflow
+
+`goverlay_latest` and `zluda_custom` are kept current with
+[`nix-update`](https://github.com/nix-community/nix-update). Inside `nix develop`:
+
+```bash
+# goverlay: tracks the newest upstream release tag
+nix-update --flake goverlay_latest
+
+# zluda: upstream marks an old 'v6' release as 'latest', so we match the
+# newest v7-preview.* tag instead (preview counts as unstable for nix-update)
+nix-update --flake --version unstable --version-regex '^v?(7-preview\.[0-9]+)$' zluda_custom
+```
+
+Both packages also carry `passthru.updateScript` for tooling that runs update
+hooks. Always build-test a bump (`nix build .#packages.x86_64-linux.zluda_custom`)
+before merging: zluda in particular often needs expression tweaks per release
+(see the comments in its `default.nix`).
 
 ## Neovim Update Workflow
 

@@ -32,13 +32,25 @@
     // flake-utils.lib.eachDefaultSystem (
       system:
       let
-        pkgs = import nixpkgs { inherit system; };
-        zluda_custom = pkgs.callPackage ./packages/zluda { };
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ self.overlays.default ];
+        };
       in
       {
+        # Directly buildable targets for CI and the nix-build-infra prebuilder.
         packages = {
+          zluda_custom = pkgs.zluda_custom;
+          goverlay_latest = pkgs.goverlay_latest;
+        };
 
-          zluda_custom = zluda_custom;
+        formatter = pkgs.nixfmt;
+
+        devShells.default = pkgs.mkShell {
+          packages = [
+            pkgs.nix-update
+            pkgs.nixfmt
+          ];
         };
       }
     );
