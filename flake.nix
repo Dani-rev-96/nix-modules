@@ -23,9 +23,7 @@
       overlays = {
         default = final: prev: {
           my-nvim-kickstart = final.callPackage ./packages/nvim-kickstart { };
-          opentrack_custom = final.qt5.callPackage ./packages/opentrack { };
           goverlay_latest = final.callPackage ./packages/goverlay { };
-          vulkan-hdr-layer = final.callPackage ./packages/vkHdrLayer { };
           zluda_custom = prev.callPackage ./packages/zluda { };
         };
       };
