@@ -23,7 +23,9 @@ jobs:
       - name: Check formatting
         run: nix develop --command nixfmt --check $(git ls-files '*.nix')
       - name: Evaluate flake outputs
-        run: nix flake show --all-systems
+        # No --all-systems: nixpkgs 26.11 dropped x86_64-darwin support,
+        # so evaluating darwin outputs of eachDefaultSystem throws.
+        run: nix flake show
       - name: Evaluate packages (no builds)
         run: |
           nix eval --raw .#packages.x86_64-linux.goverlay_latest.version && echo
