@@ -14,7 +14,7 @@ in
     enable = lib.mkEnableOption "dani-modules development tools";
     java = lib.mkEnableOption "Java development (JDT, Maven)";
     embedded = lib.mkEnableOption "Embedded development (PlatformIO, AVR, ESP)";
-    web = lib.mkEnableOption "Web development (Deno, TypeScript LSP)";
+    web = lib.mkEnableOption "Web development (Deno, TypeScript 7, TypeScript LSP)";
     nix = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -42,6 +42,7 @@ in
       ]
       ++ (lib.optionals cfg.web [
         deno
+        typescript-go # TS7 native compiler + LSP (`tsc --lsp`), global fallback for nvim
         typescript-language-server
         vscode-langservers-extracted
       ])

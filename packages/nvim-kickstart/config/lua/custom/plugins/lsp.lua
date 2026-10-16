@@ -90,6 +90,13 @@ local attach_callback = function(event)
   --  the definition of its *type*, not where it was *defined*.
   map('grt', require('fzf-lua').lsp_typedefs, '[G]oto [T]ype Definition')
 
+  if client and client.name == 'tsc' then
+    -- TS7 speaks plain LSP (no `_typescript.*` workspace commands).
+    map('gro', function()
+      vim.lsp.buf.code_action { context = { only = { 'source.organizeImports' } }, apply = true }
+    end, '[G]oto [O]rganize Imports')
+  end
+
   if client and client.name == 'ts_ls' then
     map('gro', function()
       ts_organize_imports(client, bufnr)
@@ -223,6 +230,88 @@ end
 
 local java_filetypes = 'java'
 
+-- TypeScript server selection (TS7 `tsc --lsp` vs. `ts_ls`), decided per project:
+--   * Vue project            -> ts_ls (vue_ls needs @vue/typescript-plugin, which
+--                               TS7 can't load: no tsserver plugin support)
+--   * TS7 binary available   -> tsc (native, much faster)
+--   * otherwise              -> ts_ls (fallback)
+local ts_select = {}
+
+local ts_lockfiles = { 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lockb', 'bun.lock' }
+
+---@param bufnr integer
+---@return string
+function ts_select.project_root(bufnr)
+  return vim.fs.root(bufnr, ts_lockfiles) or vim.fs.root(bufnr, { '.git' }) or vim.fn.getcwd()
+end
+
+local vue_cache = {} ---@type table<string, boolean>
+
+--- True if any package.json between the buffer and the project root depends on vue/nuxt.
+---@param bufnr integer
+---@param root string
+---@return boolean
+function ts_select.is_vue_project(bufnr, root)
+  local dir = vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
+  local key = dir .. '|' .. root
+  if vue_cache[key] ~= nil then
+    return vue_cache[key]
+  end
+  local result = false
+  local manifests = vim.fs.find('package.json', { upward = true, path = dir, stop = vim.fs.dirname(root), limit = math.huge })
+  for _, manifest in ipairs(manifests) do
+    local ok, pkg = pcall(function()
+      return vim.json.decode(table.concat(vim.fn.readfile(manifest), '\n'))
+    end)
+    if ok and type(pkg) == 'table' then
+      for _, field in ipairs { 'dependencies', 'devDependencies', 'peerDependencies' } do
+        local deps = pkg[field]
+        if type(deps) == 'table' and (deps.vue or deps.nuxt) then
+          result = true
+        end
+      end
+    end
+  end
+  vue_cache[key] = result
+  return result
+end
+
+local ts7_cache = {} ---@type table<string, string|false>
+
+--- Path of a TypeScript >= 7 binary (supports `--lsp`) for the given root, or nil.
+--- Project-local binaries win over the global one (dani-modules.development.web).
+---@param root string
+---@return string?
+function ts_select.ts7_bin(root)
+  if ts7_cache[root] == nil then
+    ts7_cache[root] = false
+    local local_bin = vim.fs.joinpath(root, 'node_modules', '.bin')
+    for _, bin in ipairs { vim.fs.joinpath(local_bin, 'tsc'), vim.fs.joinpath(local_bin, 'tsgo'), 'tsc', 'tsgo' } do
+      if vim.fn.executable(bin) == 1 then
+        local out = vim.system({ bin, '--version' }, { text = true }):wait()
+        local version = out.code == 0 and vim.version.parse(out.stdout or '') or nil
+        if version and version.major >= 7 then
+          ts7_cache[root] = bin
+          break
+        end
+      end
+    end
+  end
+  return ts7_cache[root] or nil
+end
+
+---@param bufnr integer
+---@return boolean
+function ts_select.is_deno(bufnr)
+  local project_root = vim.fs.root(bufnr, ts_lockfiles)
+  local deno_root = vim.fs.root(bufnr, { 'deno.json', 'deno.jsonc' })
+  local deno_lock_root = vim.fs.root(bufnr, { 'deno.lock' })
+  if deno_lock_root and (not project_root or #deno_lock_root > #project_root) then
+    return true
+  end
+  return deno_root ~= nil and (not project_root or #deno_root >= #project_root)
+end
+
 local function has(plugin)
   return require('lazy.core.config').plugins[plugin] ~= nil
 end
@@ -347,6 +436,10 @@ return {
         configNamespace = 'typescript',
       }
 
+      -- Capture lspconfig's default ts_ls root_dir before it is overridden below.
+      local ts_ls_default = vim.lsp.config.ts_ls or {}
+      local ts_ls_default_root_dir = ts_ls_default.root_dir
+
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --
@@ -449,7 +542,53 @@ return {
             },
           },
         },
+        -- TypeScript 7 native language server. Only attaches outside Vue projects
+        -- and when a TS >= 7 binary is found (see ts_select above).
+        tsc = {
+          cmd = function(dispatchers, config)
+            local bin = ts_select.ts7_bin(config.root_dir) or 'tsc'
+            return vim.lsp.rpc.start({ bin, '--lsp', '--stdio' }, dispatchers, { cwd = config.root_dir })
+          end,
+          filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+          root_dir = function(bufnr, on_dir)
+            if ts_select.is_deno(bufnr) then
+              return
+            end
+            local root = ts_select.project_root(bufnr)
+            if ts_select.is_vue_project(bufnr, root) or not ts_select.ts7_bin(root) then
+              return
+            end
+            on_dir(root)
+          end,
+          settings = {
+            ['js/ts'] = {
+              inlayHints = {
+                parameterNames = { enabled = 'all', suppressWhenArgumentMatchesName = false },
+                parameterTypes = { enabled = true },
+                variableTypes = { enabled = true, suppressWhenTypeMatchesName = false },
+                propertyDeclarationTypes = { enabled = true },
+                functionLikeReturnTypes = { enabled = true },
+                enumMemberValues = { enabled = true },
+              },
+            },
+          },
+        },
         ts_ls = {
+          -- Defer to tsc (TS7) in non-Vue projects that have it; Vue projects and
+          -- projects without TS7 keep using ts_ls + @vue/typescript-plugin.
+          root_dir = function(bufnr, on_dir)
+            if vim.bo[bufnr].filetype ~= 'vue' then
+              local root = ts_select.project_root(bufnr)
+              if not ts_select.is_vue_project(bufnr, root) and ts_select.ts7_bin(root) then
+                return
+              end
+            end
+            if ts_ls_default_root_dir then
+              ts_ls_default_root_dir(bufnr, on_dir)
+            elseif not ts_select.is_deno(bufnr) then
+              on_dir(ts_select.project_root(bufnr))
+            end
+          end,
           init_options = {
             plugins = {
               vue_plugin,
@@ -580,6 +719,11 @@ return {
 
       ensure_installed = vim.tbl_filter(function(name)
         return name ~= 'css_classes'
+      end, ensure_installed)
+
+      -- TS7 comes from the project's node_modules or Nix (typescript-go), not Mason.
+      ensure_installed = vim.tbl_filter(function(name)
+        return name ~= 'tsc'
       end, ensure_installed)
 
       vim.list_extend(ensure_installed, {
@@ -990,10 +1134,10 @@ return {
       -- Setup keymap and dap after the lsp is fully attached.
       -- https://github.com/mfussenegger/nvim-jdtls#nvim-dap-configuration
       -- https://neovim.io/doc/user/lsp.html#LspAttach
+      -- The generic keymaps (attach_callback) come from the global 'kickstart-lsp-attach'
+      -- autocmd in nvim-lspconfig, which also covers jdtls; only jdtls extras go here.
       vim.api.nvim_create_autocmd('LspAttach', {
         callback = function(args)
-          attach_callback(args)
-
           local client = vim.lsp.get_client_by_id(args.data.client_id)
           if client and client.name == 'jdtls' then
             local wk = require 'which-key'
@@ -1081,6 +1225,32 @@ return {
           end
         end,
       })
+
+      -- Clean the per-project jdtls workspace and re-attach so the Eclipse formatter
+      -- profile (java.format.settings.url + profile) is re-imported. jdtls only reads
+      -- the profile on a fresh workspace import, so after editing the formatter XML or
+      -- the profile name, run :JdtlsClean (it stops the server, wipes the cache, and
+      -- re-imports) instead of manually killing processes. See eclipse.jdt.ls #1736/#3108.
+      vim.api.nvim_create_user_command('JdtlsClean', function()
+        local fname = vim.api.nvim_buf_get_name(0)
+        local root_dir = opts.root_dir(fname)
+        if not root_dir then
+          vim.notify('JdtlsClean: no jdtls root for this buffer', vim.log.levels.WARN)
+          return
+        end
+        local project_name = opts.project_name(root_dir)
+        local root_uri = vim.uri_from_fname(root_dir)
+        for _, client in ipairs(vim.lsp.get_clients()) do
+          if client.name == 'jdtls' and (client.config.root_uri == root_uri or client.config.root_dir == root_dir) then
+            client:stop()
+          end
+        end
+        vim.fn.delete(opts.jdtls_workspace_dir(project_name), 'rf')
+        vim.fn.delete(opts.jdtls_config_dir(project_name), 'rf')
+        -- Give the old server a moment to release the workspace files, then re-import.
+        vim.defer_fn(attach_jdtls, 1500)
+        vim.notify('JdtlsClean: cleaned workspace for ' .. project_name .. '; re-importing formatter profile…', vim.log.levels.INFO)
+      end, { desc = 'Clean the jdtls workspace for the current project and re-import the formatter profile' })
 
       -- Avoid race condition by calling attach the first time, since the autocmd won't fire.
       attach_jdtls()
