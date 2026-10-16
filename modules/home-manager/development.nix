@@ -42,7 +42,10 @@ in
       ]
       ++ (lib.optionals cfg.web [
         deno
-        typescript-go # TS7 native compiler + LSP (`tsc --lsp`), global fallback for nvim
+        # TS7 native compiler + LSP (`tsc --lsp`), global fallback for nvim.
+        # Newer nixpkgs ship TS7 as `typescript` (and `typescript-go` is a throwing
+        # alias); older ones still have TS5 as `typescript` and TS7 as `typescript-go`.
+        (if lib.versionAtLeast typescript.version "7" then typescript else typescript-go)
         typescript-language-server
         vscode-langservers-extracted
       ])
