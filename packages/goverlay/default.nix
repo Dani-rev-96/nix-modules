@@ -73,6 +73,8 @@ stdenv.mkDerivation (finalAttrs: {
     qt6Packages.wrapQtAppsHook
   ];
 
+  dontWrapQtApps = true;
+
   buildInputs = [
     qt6Packages.libqtpas
     qt6Packages.qtbase
@@ -167,6 +169,11 @@ stdenv.mkDerivation (finalAttrs: {
         qt6Packages.libqtpas
       ]
     }
+
+    # Only wrap Qt-dependent executables.
+    # Leave bgmod and bgmod-uninstaller as native ELF binaries.
+    wrapQtApp "$out/libexec/goverlay"
+    wrapQtApp "$out/libexec/bgmod-splash"
   '';
 
   passthru.updateScript = nix-update-script {
