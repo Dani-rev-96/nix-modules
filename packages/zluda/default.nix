@@ -14,16 +14,19 @@
   nix-update-script,
   rustPlatform,
   stdenv,
+  zstd,
+  pkg-config,
+  sqlite,
 }:
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "zluda";
-  version = "7-preview.15";
+  version = "7-preview.20";
 
   src = pkgs.fetchgit {
     url = "https://github.com/vosen/ZLUDA.git";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-2RUelprPfA3VpR4ZAEGgfsR2xl0EyY88JA00eRFD//w=";
+    hash = "sha256-yhQu6z/UoPAY5JjyZvWYlRaALjNX6QJuxsBLAaaOaNg=";
     fetchSubmodules = true;
     fetchLFS = true;
   };
@@ -51,6 +54,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     zlib
     libxml2
     libedit
+    zstd
+    sqlite
   ];
 
   nativeBuildInputs = [
@@ -59,9 +64,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
     rustc
     cmake
     clang
+    pkg-config
   ];
 
-  cargoHash = "sha256-ewmhTFmwU11vTcFIcaZqCdnWJjVD8wPjK7l2K2nQiMg=";
+  cargoHash = "sha256-wvWnFpAgSf4ZIqgBrrOtl0LLH/M0mioqfWYzwHTdEZE=";
 
   # Tests require a GPU and segfault in the sandbox
   doCheck = false;
